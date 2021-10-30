@@ -1,4 +1,13 @@
 # Jarkom-Modul-2-C02-2021
+
+
+|         Nama        |       NRP      |
+|        :----:       |     :----:     |
+| Muhammad Bagus I    | 05111940000049 |
+| Christoffer Ivano   | 05111940000091 |
+| Bayu Adjie Sidharta | 05111940000172 |
+
+
 ## 1. Membuat topologi seperti disoal
 ![image](https://user-images.githubusercontent.com/31591861/139530901-8e9b99db-2517-47a3-bfb5-b7d560583c86.png)
 
@@ -439,14 +448,19 @@ service apache2 restart
 
 Untuk mengecek hasilnya bisa dicoba pada Loguetown dengan :
 ```
-Lynx general.mecha.franky.c02.com:15000
+lynx general.mecha.franky.c02.com:15000
 ``` 
 dan
 ```
-ynx general.mecha.franky.c02.com:15500
+lynx general.mecha.franky.c02.com:15500
 ``` 
 
 Berikut adalah hasilnya :
+
+[![1635604218357.jpg](https://i.postimg.cc/wxhTt0j8/1635604218357.jpg)](https://postimg.cc/DmwKHQGB)
+
+[![1635604240335.jpg](https://i.postimg.cc/tTNwbZpf/1635604240335.jpg)](https://postimg.cc/cg6XMJKM)
+
 
 ## 15. Autentikasi username luffy dan password onepiece dan file di /var/www/general.mecha.franky.yyy
 
@@ -488,10 +502,15 @@ Lynx general.mecha.franky.c02.com:15500
 ``` 
 
 Berikut adalah hasilnya, Masukkan username :
+[![1635605175201.jpg](https://i.postimg.cc/Jnx6gfQC/1635605175201.jpg)](https://postimg.cc/ygJy3r5L)
 
 Masukkan Password :
+[![1635605186017.jpg](https://i.postimg.cc/RVNssb62/1635605186017.jpg)](https://postimg.cc/4mRQnP11)
 
 Situs berhasil diakses :
+[![1635604218357.jpg](https://i.postimg.cc/wxhTt0j8/1635604218357.jpg)](https://postimg.cc/DmwKHQGB)
+
+[![1635605205612.jpg](https://i.postimg.cc/0yStxMCf/1635605205612.jpg)](https://postimg.cc/NKg8k0S9)
 
 ## 16. Setiap kali mengakses IP Skypie akan dialihkan secara otomatis ke www.franky.yyy.com
 
@@ -517,6 +536,10 @@ Lalu restart apache
 service apache2 restart
 ```
 Tes dengan `lynx 10.15.2.4` pada Loguetown, Maka akan langung di akses www.franky.c02.com :
+[![1635606208846.jpg](https://i.postimg.cc/L57TF2Yw/1635606208846.jpg)](https://postimg.cc/K3PLnX5D)
+
+[![1635606224753.jpg](https://i.postimg.cc/XJjxw26H/1635606224753.jpg)](https://postimg.cc/7CRg4n60)
+
 
 ## 17. Mengarahkan request gambar dari client yang memiliki substring 'franky' di super.franky.yyy.com ke file franky.png
 
@@ -543,5 +566,18 @@ service apache2 restart
 ```
 
 Test dengan file yang memiliki substring franky :
+[![1635606290182-1.jpg](https://i.postimg.cc/FsMZPFQJ/1635606290182-1.jpg)](https://postimg.cc/qzGyqTqk)
 
 Test dengan file yang tidak memiliki substring franky :
+[![1635606290182-1.jpg](https://i.postimg.cc/FsMZPFQJ/1635606290182-1.jpg)](https://postimg.cc/qzGyqTqk)
+
+[![1635606324622.jpg](https://i.postimg.cc/VvctqvtY/1635606324622.jpg)](https://postimg.cc/G8q9rczN)
+
+[![1635606337121.jpg](https://i.postimg.cc/kMxKnNrD/1635606337121.jpg)](https://postimg.cc/s1gvmhgR)
+
+# Kendala
+1. Text editor sering lemot
+2. Jaringan error
+3. Mati lampu yang membuat projek rusak
+4. Tiba tiba error yang tidak tau kenapa, kebanyakan karena typo
+5. Telat submit lapres hanya karena gabisa dicoba ulang untuk ss, padahal demo sudah berhasil
