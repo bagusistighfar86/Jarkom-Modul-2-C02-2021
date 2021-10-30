@@ -123,29 +123,215 @@ Setelah itu restart bind dengan command `service bind9 restart`
 
 ![image](https://user-images.githubusercontent.com/31591861/139531407-a5326ee5-ebd9-4db3-af62-2835d6cbb1ad.png)
 
-## 3. Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.franky.yyy.com. Pertama, luffy membutuhkan webserver dengan DocumentRoot pada /var/www/franky.yyy.com.
+## 3. Setelah itu buat subdomain `super.franky.yyy.com` dengan alias `www.super.franky.yyy.com` yang diatur DNS nya di EniesLobby dan mengarah ke Skypie.
 
 ## Jawaban
 
 
-## 4. Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.franky.yyy.com. Pertama, luffy membutuhkan webserver dengan DocumentRoot pada /var/www/franky.yyy.com.
+
+Edit file `/etc/bind/kaizoku/franky.c02.com` dengan
+```
+;
+;BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     franky.c02.com. root.franky.c02.com. (
+                     2021100401         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      franky.c02.com. 
+@       IN      A       10.15.2.4 ;Enieslobby
+WWW     IN      CNAME   franky.c02.com.
+super   IN      A       10.15.2.4; Skypie
+WWW.super    IN      CNAME   super.franky.c02.com. 
+```
+
+Lalu restart bind9
+
+![image](https://user-images.githubusercontent.com/31591861/139532027-88654d18-ee23-489d-9bcd-d3f381b9e89a.png)
+
+
+## 4. Buat juga reverse domain untuk domain utama.
+
+## Jawaban
+
+Edit file named.conf.local dengan menambahkan
+```
+zone "2.15.10.in-addr.arpa" {
+    type master;
+    file "/etc/bind/kaizoku/2.15.10.in-addr.arpa";
+};
+```
+
+Edit file `/etc/bind/kaizoku/franky.c02.com` dengan
+```
+;
+;BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     franky.c02.com. root.franky.c02.com. (
+                     2021100401         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+2.15.10.in-addr.arpa.       IN      NS      franky.c02.com.
+4       IN      PTR     franky.c02.com.
+```
+
+Setelah itu copy file `db.local` ke `/etc/bind/kaizoku/2.15.10.in-addr.arpa` dengan menggunakan command `cp /etc/bind/db.local /etc/bind/kaizoku/2.15.10.in-addr.arpa` 
+
+Lalu restart bind dengan command yang sama!
+
+![image](https://user-images.githubusercontent.com/31591861/139532779-d41f78dc-0d37-4310-aa85-80c4208f0e23.png)
+
+
+## 5. Supaya tetap bisa menghubungi Franky jika server EniesLobby rusak, maka buat Water7 sebagai DNS Slave untuk domain utama
 
 ## Jawaban
 
 
-## 5. Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.franky.yyy.com. Pertama, luffy membutuhkan webserver dengan DocumentRoot pada /var/www/franky.yyy.com.
+Edit file named.conf.local dengan mengganti
+```
+zone "franky.c02.com" {
+        type master;
+        notify yes;
+        also-notify { 10.15.2.3; };
+        allow-transfer { 10.15.2.3; };
+        file "/etc/bind/kaizoku/franky.c02.com";
+};
+```
+
+### Water7
+
+
+Edit file named.conf.local dengan menambahkan
+```
+zone "franky.c02.com" {
+    type slave;
+    masters { 10.15.2.2; }; // Masukan IP EniesLobby tanpa tanda petik
+    file "/var/lib/bind/franky.c02.com";
+};
+```
+
+lalu restart bind kedua node
+
+
+Edit `/etc/resolv.conf` di loguetown
+```
+nameserver 10.15.2.2
+nameserver 10.15.2.3
+nameserver 192.168.122.1
+```
+![image](https://user-images.githubusercontent.com/31591861/139533607-38228726-a2a8-453a-9d41-799f17291383.png)
+
+
+## 6. Setelah itu terdapat subdomain `mecha.franky.yyy.com` dengan alias `www.mecha.franky.yyy.com` yang didelegasikan dari EniesLobby ke Water7 dengan IP menuju ke Skypie dalam folder sunnygo.
+
+## Jawaban
+Edit file named.conf.local dengan mengedit
+```
+zone "franky.c02.com" {
+        type master;
+        notify yes;
+        also-notify { 10.15.2.3; };
+        allow-transfer { 10.15.2.3; };
+        file "/etc/bind/kaizoku/franky.c02.com";
+};
+```
+
+lalu edit bind menjadi
+```
+;
+;BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     franky.c02.com. root.franky.c02.com. (
+                     2021100401         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      franky.c02.com. 
+@       IN      A       10.15.2.4 ;Enieslobby
+WWW     IN      CNAME   franky.c02.com.
+super   IN      A       10.15.2.4; Skypie
+WWW.super       IN      CNAME   super.franky.c02.com. 
+ns1     IN      A       10.15.2.3;
+mecha   IN      NS      ns1; 
+```
+
+### Water7
+
+```
+zone "franky.c02.com" {
+    type slave;
+    masters { 10.15.2.2; }; // Masukan IP EniesLobby tanpa tanda petik
+    file "/var/lib/bind/franky.c02.com";
+};
+```
+
+Buat directory sunnygo `mkdir /etc/bind/sunnygo` lalu copy `cp /etc/bind/db.local /etc/bind/sunnygo/mecha.franky.c02.com`
+
+lalu edit bind menjadi
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     mecha.franky.c02.com. root.mecha.franky.c02.com. (
+                        2021100401      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      mecha.franky.c02.com.
+@       IN      A       10.15.2.4;
+Www     IN      CNAME   mecha.franky.c02.com.;
+general IN      A       10.15.2.4;
+www.general IN      CNAME       general.mecha.franky.c02.com.;
+```
+
+lalu restart kedua service bind
+
+![image](https://user-images.githubusercontent.com/31591861/139533901-e4089f61-678e-4d24-b1f1-965b566e7bd6.png)
+
+
+## 7. Untuk memperlancar komunikasi Luffy dan rekannya, dibuatkan subdomain melalui Water7 dengan nama `general.mecha.franky.yyy.com` dengan alias `www.general.mecha.franky.yyy.com` yang mengarah ke Skypie.
 
 ## Jawaban
 
+### Water7 
 
-## 6. Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.franky.yyy.com. Pertama, luffy membutuhkan webserver dengan DocumentRoot pada /var/www/franky.yyy.com.
+edit bind menjadi
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     mecha.franky.c02.com. root.mecha.franky.c02.com. (
+                        2021100401      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      mecha.franky.c02.com.
+@       IN      A       10.15.2.4;
+Www     IN      CNAME   mecha.franky.c02.com.;
+general IN      A       10.15.2.4;
+www.general IN      CNAME       general.mecha.franky.c02.com.;
+```
 
-## Jawaban
+lalu restart bind
 
-
-## 7. Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.franky.yyy.com. Pertama, luffy membutuhkan webserver dengan DocumentRoot pada /var/www/franky.yyy.com.
-
-## Jawaban
+![image](https://user-images.githubusercontent.com/31591861/139533925-5e34747b-4e37-40db-8682-9032525f77cd.png)
 
 
 ## 8. Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.franky.yyy.com. Pertama, luffy membutuhkan webserver dengan DocumentRoot pada /var/www/franky.yyy.com.
@@ -203,62 +389,39 @@ Untuk dapat mengakses `www.super.franky.yyy.com/public/js` menjadi `www.super.fr
 
 ## Jawaban
 Masuk ke /etc/apache2/sites-available/
-```
-cd /etc/apache2/sites-available/
-```
+`cd /etc/apache2/sites-available/`
 Lalu copy file 000-default.conf ke file baru general.mecha.franky.c02.com.conf
-```
-cp 000-default.conf general.mecha.franky.c02.com.conf
-```
+`cp 000-default.conf general.mecha.franky.c02.com.conf`
 Ubah isi general.mecha.franky.c02.com.conf dengan :
-```
-<VirtualHost *:15000 *:15500>
+`<VirtualHost *:15000 *:15500>
 ServerName general.mecha.franky.c02.com
 ServerAdmin webmaster@localhost
 DocumentRoot /var/www/general.mecha.franky.c02.com
-ServerAlias www.general.mecha.franky.c02.com
-```
+ServerAlias www.general.mecha.franky.c02.com`
 Untuk di dalam script.sh bisa langsung cat dari /root/general.mecha.franky.c02.com.conf ke /etc/apache2/sites-available/general.mecha.franky.c02.com.conf karena settingan conf sudah disimpan di /root
-```
-cat /root/general.mecha.franky.c02.com.conf > /etc/apache2/sites-available/general.mecha.franky.c02.com.conf
-```
+`cat /root/general.mecha.franky.c02.com.conf > /etc/apache2/sites-available/general.mecha.franky.c02.com.conf`
 
 Kembali ke folder sebelumnya yakni /etc/apache2/ . Lalu Masukkan listen untuk port 15000 dan 15500 
-```
-cd ..
-```
+`cd ..`
 Tambahkan berikut pada ports.conf
-```
-...
-	Listen 15000
-	Listen 15500
-...
-```
+`...
+Listen 15000
+Listen 15500
+...`
 Jika pada script.sh bisa langsung cat file ports.conf pada /root karena settingan sudah disimpan
-```
-cat /root/ports.conf > /etc/apache2/ports.conf
-```
+`cat /root/ports.conf > /etc/apache2/ports.conf`
 
 Buat folder baru untuk project webnya, lalu copy seluruh isi dari hasil unzip file general.mecha.franky.zip ke /var/www/general.mecha.franky.c02.com secara rekursif 
-```
-mkdir /var/www/general.mecha.franky.c02.com
-cp -R /root/general.mecha.franky/* /var/www/general.mecha.franky.c02.com
-```
+`mkdir /var/www/general.mecha.franky.c02.com
+cp -R /root/general.mecha.franky/* /var/www/general.mecha.franky.c02.com`
 
 Lalu aktifkan dengan a2ensite web general.mecha.franky.c02.com tadi, dan restart apache
-```
-a2ensite general.mecha.franky.c02.com
-service apache2 restart
-```
+`a2ensite general.mecha.franky.c02.com
+service apache2 restart`
 
 Untuk mengecek hasilnya bisa dicoba pada Loguetown dengan :
-```
-Lynx general.mecha.franky.c02.com:15000
-``` 
-dan
-```
-ynx general.mecha.franky.c02.com:15500
-``` 
+`Lynx general.mecha.franky.c02.com:15000` dan 
+`Lynx general.mecha.franky.c02.com:15500` 
 
 Berikut adalah hasilnya :
 
@@ -266,40 +429,27 @@ Berikut adalah hasilnya :
 
 ## Jawaban
 Buka file /etc/apache2/sites-available/general.mecha.franky.c02.conf
-```
-cd /etc/apache2/sites-available/
-vi general.mecha.franky.c02.com.conf
-```
+`cd /etc/apache2/sites-available/
+vi general.mecha.franky.c02.com.conf`
 Tambahkan dengan settingan berikut :
-```
-...
-	<Directory "/var/www/general.mecha.franky.c02.com">
-	    AuthType Basic
-	    AuthName "Restricted Content"
-	    AuthUserFile /etc/apache2/.htpasswd
-	    Require valid-user
-	</Directory>
-...
-```
+`...
+<Directory "/var/www/general.mecha.franky.c02.com">
+    AuthType Basic
+    AuthName "Restricted Content"
+    AuthUserFile /etc/apache2/.htpasswd
+    Require valid-user
+</Directory>
+...`
 Untuk file pada script.sh langsung cat dari /root/general.mecha.franky.c02.com.conf ke /etc/apache2/sites-available/general.mecha.franky.c02.com.conf karena settingan sudah disimpan
-```
-cat /root/general.mecha.franky.c02.com.conf > /etc/apache2/sites-available/general.mecha.franky.c02.com.conf
-```
+`cat /root/general.mecha.franky.c02.com.conf > /etc/apache2/sites-available/general.mecha.franky.c02.com.conf`
 
 Buat username luffy dengan password onepiece untuk mengakses web general.mecha.franky.c02.com. Lalu restart apache
-```
-htpasswd -c /etc/apache2/.htpasswd luffy onepiece
-service apache2 restart
-```
+`htpasswd -c /etc/apache2/.htpasswd luffy onepiece
+service apache2 restart`
 
 Tes dengan membuka kembali menggunakan
-```
-Lynx general.mecha.franky.c02.com:15000
-``` 
-dan 
-```
-Lynx general.mecha.franky.c02.com:15500
-``` 
+`Lynx general.mecha.franky.c02.com:15000` dan 
+`Lynx general.mecha.franky.c02.com:15500` 
 
 Berikut adalah hasilnya, Masukkan username :
 
@@ -311,50 +461,35 @@ Situs berhasil diakses :
 
 ## Jawaban
 Masuk ke dalam /var/www/html. Lalu buat file .htaccess disana. 
-```
-cd /var/www/html/
-```
+`cd /var/www/html/`
 Kemudian tuliskan konfigurasi berikut pada .htaccess nya. NB :[IP Prefix].2.4
-```
-RewriteEngine On
+`RewriteEngine On
 RewriteBase /
 RewriteCond %{HTTP_HOST} ^10\.15\.2\.4$
-RewriteRule ^(.*)$ http://www.franky.c02.com/$1 [L,R=301]
-```
+RewriteRule ^(.*)$ http://www.franky.c02.com/$1 [L,R=301]`
 Pada script.sh langsung cat /root/htaccess.txt ke /var/www/html/.htaccess , karena settingan sudah sudah disimpan
-```
-cat /root/htaccess.txt > /var/www/html/.htaccess
-```
+`cat /root/htaccess.txt > /var/www/html/.htaccess`
 
 Lalu restart apache
-```
-service apache2 restart
-```
+`service apache2 restart`
 Tes dengan `lynx 10.15.2.4` pada Loguetown, Maka akan langung di akses www.franky.c02.com :
 
 ## 17. Mengarahkan request gambar dari client yang memiliki substring 'franky' di super.franky.yyy.com ke file franky.png
 
 ## Jawaban
 Masuk ke dalam /var/www/super.franky.c02.com , Lalu buat file .htaccess disana. 
-```
-cd /var/www/super.franky.c02.com
-```
+`cd /var/www/super.franky.c02.com`
 
 Isikan .htaccess dengan konfigurasi berikut : 
-```
-RewriteEngine On
+`RewriteEngine On
 RewriteRule (.*)franky(.*)(\.jpg|\.png|\.gif)$ http://super.franky.c02.com/public/images/franky.png [L,R=301]
-```
+`
 RewriteRule akan melakukan redirect 301 dari request dengan regex yang telah dibuat untuk menuju path yang memiliki substring franky dan melanjutkan request yang berupa gambar ke file franky.png
 Pada script.sh langsung cat /root/super-franky-htaccess.txt ke /var/www/super.franky.c02.com/.htaccess , karena settingan sudah sudah disimpan.
-```
-cat /root/super-franky-htaccess.txt > /var/www/super.franky.c02.com/.htaccess
-```
+`cat /root/super-franky-htaccess.txt > /var/www/super.franky.c02.com/.htaccess`
 
 Lalu restart apache
-```
-service apache2 restart
-```
+`service apache2 restart`
 
 Test dengan file yang memiliki substring franky :
 
