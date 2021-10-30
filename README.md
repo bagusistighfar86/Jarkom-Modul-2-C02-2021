@@ -5,7 +5,7 @@
 ## Jawaban
 Pertama, install apache2 dengan `apt-get install apache2` dan install php dengan `apt-get install php`.
 Berikut adalah untuk konfigurasi dari franky.c02.com.conf. Mengganti documentRoot dan menambahkan serverName dan serverAlias sesuai format soal, yaitu franky.c02.com
-![image](https://user-images.githubusercontent.com/73484021/139518473-41ad689a-12fd-4464-b0ef-af1cf7b1602f.png).
+![image](https://user-images.githubusercontent.com/73484021/139518473-41ad689a-12fd-4464-b0ef-af1cf7b1602f.png).<br>
 Buat direktori baru dengan `mkdir franky.c02.com` pada `/var/www`. Jalankan perintah `franky.c02.com`.
 
 ## 9. Setelah itu, Luffy juga membutuhkan agar url www.franky.yyy.com/index.php/home dapat menjadi menjadi www.franky.yyy.com/home. 
