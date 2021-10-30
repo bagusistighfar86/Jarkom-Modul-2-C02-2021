@@ -203,9 +203,13 @@ Untuk dapat mengakses `www.super.franky.yyy.com/public/js` menjadi `www.super.fr
 
 ## Jawaban
 Masuk ke /etc/apache2/sites-available/
-```cd /etc/apache2/sites-available/```
+```
+cd /etc/apache2/sites-available/
+```
 Lalu copy file 000-default.conf ke file baru general.mecha.franky.c02.com.conf
-```cp 000-default.conf general.mecha.franky.c02.com.conf```
+```
+cp 000-default.conf general.mecha.franky.c02.com.conf
+```
 Ubah isi general.mecha.franky.c02.com.conf dengan :
 ```
 <VirtualHost *:15000 *:15500>
@@ -215,19 +219,25 @@ DocumentRoot /var/www/general.mecha.franky.c02.com
 ServerAlias www.general.mecha.franky.c02.com
 ```
 Untuk di dalam script.sh bisa langsung cat dari /root/general.mecha.franky.c02.com.conf ke /etc/apache2/sites-available/general.mecha.franky.c02.com.conf karena settingan conf sudah disimpan di /root
-```cat /root/general.mecha.franky.c02.com.conf > /etc/apache2/sites-available/general.mecha.franky.c02.com.conf```
+```
+cat /root/general.mecha.franky.c02.com.conf > /etc/apache2/sites-available/general.mecha.franky.c02.com.conf
+```
 
 Kembali ke folder sebelumnya yakni /etc/apache2/ . Lalu Masukkan listen untuk port 15000 dan 15500 
-```cd ..```
+```
+cd ..
+```
 Tambahkan berikut pada ports.conf
 ```
 ...
-Listen 15000
-Listen 15500
+	Listen 15000
+	Listen 15500
 ...
 ```
 Jika pada script.sh bisa langsung cat file ports.conf pada /root karena settingan sudah disimpan
-```cat /root/ports.conf > /etc/apache2/ports.conf```
+```
+cat /root/ports.conf > /etc/apache2/ports.conf
+```
 
 Buat folder baru untuk project webnya, lalu copy seluruh isi dari hasil unzip file general.mecha.franky.zip ke /var/www/general.mecha.franky.c02.com secara rekursif 
 ```
@@ -242,9 +252,13 @@ service apache2 restart
 ```
 
 Untuk mengecek hasilnya bisa dicoba pada Loguetown dengan :
-```Lynx general.mecha.franky.c02.com:15000``` 
+```
+Lynx general.mecha.franky.c02.com:15000
+``` 
 dan
-```Lynx general.mecha.franky.c02.com:15500``` 
+```
+ynx general.mecha.franky.c02.com:15500
+``` 
 
 Berikut adalah hasilnya :
 
@@ -259,16 +273,18 @@ vi general.mecha.franky.c02.com.conf
 Tambahkan dengan settingan berikut :
 ```
 ...
-<Directory "/var/www/general.mecha.franky.c02.com">
-    AuthType Basic
-    AuthName "Restricted Content"
-    AuthUserFile /etc/apache2/.htpasswd
-    Require valid-user
-</Directory>
+	<Directory "/var/www/general.mecha.franky.c02.com">
+	    AuthType Basic
+	    AuthName "Restricted Content"
+	    AuthUserFile /etc/apache2/.htpasswd
+	    Require valid-user
+	</Directory>
 ...
 ```
 Untuk file pada script.sh langsung cat dari /root/general.mecha.franky.c02.com.conf ke /etc/apache2/sites-available/general.mecha.franky.c02.com.conf karena settingan sudah disimpan
-```cat /root/general.mecha.franky.c02.com.conf > /etc/apache2/sites-available/general.mecha.franky.c02.com.conf```
+```
+cat /root/general.mecha.franky.c02.com.conf > /etc/apache2/sites-available/general.mecha.franky.c02.com.conf
+```
 
 Buat username luffy dengan password onepiece untuk mengakses web general.mecha.franky.c02.com. Lalu restart apache
 ```
@@ -277,9 +293,13 @@ service apache2 restart
 ```
 
 Tes dengan membuka kembali menggunakan
-```Lynx general.mecha.franky.c02.com:15000``` 
+```
+Lynx general.mecha.franky.c02.com:15000
+``` 
 dan 
-```Lynx general.mecha.franky.c02.com:15500``` 
+```
+Lynx general.mecha.franky.c02.com:15500
+``` 
 
 Berikut adalah hasilnya, Masukkan username :
 
@@ -291,7 +311,9 @@ Situs berhasil diakses :
 
 ## Jawaban
 Masuk ke dalam /var/www/html. Lalu buat file .htaccess disana. 
-```cd /var/www/html/```
+```
+cd /var/www/html/
+```
 Kemudian tuliskan konfigurasi berikut pada .htaccess nya. NB :[IP Prefix].2.4
 ```
 RewriteEngine On
@@ -300,17 +322,23 @@ RewriteCond %{HTTP_HOST} ^10\.15\.2\.4$
 RewriteRule ^(.*)$ http://www.franky.c02.com/$1 [L,R=301]
 ```
 Pada script.sh langsung cat /root/htaccess.txt ke /var/www/html/.htaccess , karena settingan sudah sudah disimpan
-```cat /root/htaccess.txt > /var/www/html/.htaccess```
+```
+cat /root/htaccess.txt > /var/www/html/.htaccess
+```
 
 Lalu restart apache
-```service apache2 restart```
+```
+service apache2 restart
+```
 Tes dengan `lynx 10.15.2.4` pada Loguetown, Maka akan langung di akses www.franky.c02.com :
 
 ## 17. Mengarahkan request gambar dari client yang memiliki substring 'franky' di super.franky.yyy.com ke file franky.png
 
 ## Jawaban
 Masuk ke dalam /var/www/super.franky.c02.com , Lalu buat file .htaccess disana. 
-```cd /var/www/super.franky.c02.com```
+```
+cd /var/www/super.franky.c02.com
+```
 
 Isikan .htaccess dengan konfigurasi berikut : 
 ```
@@ -319,10 +347,14 @@ RewriteRule (.*)franky(.*)(\.jpg|\.png|\.gif)$ http://super.franky.c02.com/publi
 ```
 RewriteRule akan melakukan redirect 301 dari request dengan regex yang telah dibuat untuk menuju path yang memiliki substring franky dan melanjutkan request yang berupa gambar ke file franky.png
 Pada script.sh langsung cat /root/super-franky-htaccess.txt ke /var/www/super.franky.c02.com/.htaccess , karena settingan sudah sudah disimpan.
-```cat /root/super-franky-htaccess.txt > /var/www/super.franky.c02.com/.htaccess```
+```
+cat /root/super-franky-htaccess.txt > /var/www/super.franky.c02.com/.htaccess
+```
 
 Lalu restart apache
-```service apache2 restart```
+```
+service apache2 restart
+```
 
 Test dengan file yang memiliki substring franky :
 
